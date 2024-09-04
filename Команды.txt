@@ -1,0 +1,116 @@
+1.	Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+from django.contrib.auth.models import User
+>>> user=User.objects.create_user(username='Ivan', password='Ivanpassword')
+>>> user.save()
+>>> user=User.objects.create_user(username='Olya', password='Olyapassword') 
+>>> user.save()
+2.	Создать два объекта модели Author, связанные с пользователями.
+>>> from NewsPortal.models import Author
+>>> user=User.objects.get(pk='1')
+>>> author=Author.objects.create(user=user)
+>>> author.save()
+>>> user=User.objects.get(pk='2') 
+>>> author=Author.objects.create(user=user)
+>>> author.save()
+
+3.	Добавить 4 категории в модель Category.
+>>> from NewsPortal.models import Category
+>>> category=Category(name='Спорт')
+>>> category.save()
+>>> category=Category(name='Культура')
+>>> category.save()                    
+>>> category=Category(name='Бизнес')
+>>> category.save()                  
+>>> category=Category(name='Погода')   
+>>> category.save()
+4.	Добавить 2 статьи и 1 новость.
+from NewsPortal.models import Post,Author
+>>> author=Author.objects.get(pk='1')
+>>> post=Post.objects.create(post_type='post', title='Статья 1', text='текст статьи 1', author=author)
+>>> post.save()
+>>> author=Author.objects.get(pk='1')
+>>> post=Post.objects.create(post_type='post', title='Статья 2', text='текст статьи 2', author=author) 
+>>> post.save()                       
+>>> author2=Author.objects.get(pk='1')
+>>> author2=Author.objects.get(pk='2') 
+>>> post=Post.objects.create(post_type='news', title='Новость 1', text='текст новости 1', author=author2) 
+>>> post.save()
+5.	Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+>>> from NewsPortal.models import Category,Post
+>>> post=Post.objects.get(pk='1')
+>>> category=Category.objects.get(pk='1')
+>>> post.category.add(category)                 
+>>> post.save()
+>>> post=Post.objects.get(pk='1')               
+>>> category=Category.objects.get(pk='2')       
+>>> post.category.add(category)           
+>>> post.save()                                 
+>>> post=Post.objects.get(pk='2')                                                                         
+>>> category=Category.objects.get(pk='3') 
+>>> post.category.add(category)           
+>>> post.save()                           
+>>> post=Post.objects.get(pk='3')         
+>>> category=Category.objects.get(pk='4') 
+>>> post.category.add(category)           
+>>> post.save()                           
+6.	Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+>>> from NewsPortal.models import Comment,Post
+>>> user=User.objects.get(pk='1')
+>>> post=Post.objects.get(pk='1')
+>>> comment=Comment.objects.create(text='Комментарий 1',post=post,user=user)
+>>> comment.save()
+>>> user=User.objects.get(pk='1')                                            
+>>> post=Post.objects.get(pk='2')               
+>>> comment=Comment.objects.create(text='Комментарий 2',post=post,user=user) 
+>>> comment.save()                                                           
+>>> user=User.objects.get(pk='1')                                            
+>>> post=Post.objects.get(pk='3')               
+>>> comment=Comment.objects.create(text='Комментарий 3',post=post,user=user) 
+>>> comment.save()                                                           
+>>> user=User.objects.get(pk='2')                                            
+>>> post=Post.objects.get(pk='1')                                            
+>>> comment=Comment.objects.create(text='Комментарий 4 к посту 1',post=post,user=user)
+>>> comment.save()                                                                     
+7.	Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+
+from NewsPortal.models import Comment,Post
+>>> post=Post.objects.get(pk='1')                                                      
+>>> post.like()
+>>> post.like()
+>>> post.like()
+>>> post=Post.objects.get(pk='2') 
+>>> post.like()                   
+>>> post=Post.objects.get(pk='3') 
+>>> post.like()                   
+>>> post.like()
+>>> post.like()
+>>> post.like()
+>>> comment=Comment.objects.get(pk='1')                                               
+>>> comment.like()
+>>> comment=Comment.objects.get(pk='2') 
+>>> comment.like()                      
+>>> comment.like()
+>>> comment=Comment.objects.get(pk='3') 
+>>> comment.like()                      
+>>> comment.like()
+>>> comment.like()
+>>> comment.like()
+>>> comment=Comment.objects.get(pk='4') 
+>>> comment.like()                      
+>>> comment.like()
+>>> comment.like()
+8.	Обновить рейтинги пользователей.
+>>> from NewsPortal.models import Author
+>>> author=Author.objects.get(pk='1')
+>>> author.update_rating()
+>>> author=Author.objects.get(pk='2')
+>>> author.update_rating()
+9.	Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+>>> from NewsPortal.models import Author       
+>>> best_author=Author.objects.order_by('-rating_author').first() 
+>>> print(best_author.user_one_to_one.username, best_author.rating_author)
+10.	Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье. 
+>>>from NewsPortal.models import Post
+>>>best_post = Post.objects.order_by('-post_rating').first()
+>>>print(best_post.creations,best_post.author.user_one_to_one.username, best_post.rating_post, >>>best_post.title, best_post.preview)
+11.	Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
